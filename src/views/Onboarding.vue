@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import dialogueData from '../dialogue.json';
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const Render = reactive({
   title: "",
@@ -14,10 +18,6 @@ const Render = reactive({
 
 const OverallProgress = ref(5)
 
-const Progress = reactive({})
-
-const LastStep: any = ref(null)
-
 interface Dialogue {
   [dialogue_id: string]: {
     title: string;
@@ -25,7 +25,7 @@ interface Dialogue {
     text: string;
     buttons?: {
       text: string;
-      step_id: string;
+      to: string;
     }[];
     progress_value: number;
     progress_label: string;
@@ -34,10 +34,8 @@ interface Dialogue {
 
 const dialogue: Dialogue = dialogueData;
 
-const loadDialogueStep = (dialogue_id: string, options?: string) => {
-  if (options === "back") { LastStep.value = "" } else {
-    LastStep.value = Render.id
-  }
+const Update = (dialogue_id: string) => {
+  if (!dialogue_id) { dialogue_id = route.params.id as string }
   const stepData = dialogue[dialogue_id];
   Object.assign(Render, {
     title: stepData.title,
@@ -48,14 +46,19 @@ const loadDialogueStep = (dialogue_id: string, options?: string) => {
     progress_value: stepData.progress_value,
     progress_tag: stepData.progress_label
   })
-};
+  console.log(stepData.buttons)
+}
 
-loadDialogueStep("start")
+watch(route, (to) => {
+  // do something when the route changes
+});
+
+onMounted(Update)
+
 </script>
 
 <template>
   <main>
-    <button class="back-button" v-if="LastStep !== ''" @click="loadDialogueStep(LastStep, 'back')"><img src="/images/icons/back.svg"></button>
     <p class="progress-tag">{{ Render.progress_tag }}</p>
     <div class="progress-visuals-container">
       <div class="filled" v-for="n in Render.progress_value"></div>
@@ -65,23 +68,15 @@ loadDialogueStep("start")
     <img v-if="Render.image" :src="`/images/dialogue/${Render.image}`" class="primary-image">
     <p class="primary-text" v-html="`${Render.text}`"></p>
     <div class="button-container">
-      <button v-for="button in Render.buttons" @click="loadDialogueStep(button.step_id)">{{ button.text }}</button>
+      <router-link v-for="button in Render.buttons" :to="`${button.to}`">
+        <p>{{ button.to }}</p>
+        <button>{{ button.text }}</button>
+      </router-link>
     </div>
   </main>
 </template>
 
 <style scoped>
-main {
-  --primary-blue: #0450F2;
-  --aditional-blue: #1F66FF;
-  --darker-blue: #0041CB;
-  --primary-light: #FFFFFF;
-  --aditional-light: #E6E6E6;
-  --primary-black: #000000;
-  /**/
-  padding: 1rem 15%;
-}
-
 .title {
   margin: 0;
   margin-top: 40px;

@@ -1,9 +1,30 @@
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
+    background-color: rgb(230,230,230);
 }
 
-h1,h2,h3,h4,h5,h6,p,span,button,img {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span,
+button,
+img {
     font-family: "Exo 2";
     color: var(--space-black);
+}
+
+:root {
+    --primary-blue: #0450F2;
+    --aditional-blue: #1F66FF;
+    --darker-blue: #0041CB;
+    --primary-light: #FFFFFF;
+    --aditional-light: #E6E6E6;
+    --primary-black: #000000;
 }
